@@ -60,24 +60,27 @@ function _os2web_cpr_filter_settings($form, &$form_state, $filter, $format, $def
  */
 function _os2web_cpr_filter_process($text, $filter) {
   // Finding matches
-  preg_match_all("/([0-9]{6})(-?)([0-9]{4})/", $text, $matches);
-  
+  // To prevent false positives, match must not be preceded by a digit.
+  // To prevent false positives, match must be followed by a word boundary.
+  // Will allow a separator character (whitespace|slash|dot|dash) between date-month and month-year part.
+  // Will allow a separation string (whitespace+slash|dot|dash+whitespace, or just whitespace) between date and serial part
+  preg_match_all("/(?<!\d)\d{2}([\s\/\.\-]?)\d{2}\\1\d{2}(?:\s{0,2}[\/\.-]\s{0,2}|\s{0,2})\d{4}\b/", $text, $matches);
+
   // Looping through matches and replacing them
   $replace = array();
+
   foreach (current($matches) as $value) {
-    // Modulus11 check
-    if (!$filter->settings['modulus11_check'] || $modulus11_result = _os2web_cpr_filter_modulus11($value)) {
-      $replace[$value] = $value;     	
-    }
+    // remove separator characaters (anything except digits)
+    $stripped_value = preg_replace('/[^\d]/','',$value);
     // Replacing all numbers containing a dash
-    else if ($filter->settings['replace_all_dash'] && strpos($value, '-') !== FALSE) {
+    if ($filter->settings['replace_all_dash'] && strpos($value, '-') !== FALSE) {
       $replace[$value] = $value;
     }
-    // Date check
-    else if ($filter->settings['date_check'] && isset($modulus11_result) && !$modulus11_result) {
-      if (_os2web_cpr_filter_date_check($value)) {
-        $replace[$value] = $value;
-      }
+    // Modulus11 and date check
+    else if((!$filter->settings['modulus11_check'] || _os2web_cpr_filter_modulus11($stripped_value))
+      && (!$filter->settings['date_check'] || _os2web_cpr_filter_date_check($stripped_value)) )
+    {
+    $replace[$value] = $value;  
     }
   }
 
@@ -96,7 +99,6 @@ function _os2web_cpr_filter_process($text, $filter) {
  * @return bool
  */
 function _os2web_cpr_filter_modulus11($number) {
-  $number = str_replace('-', '', $number);
   $factor = '432765432';
   $number_arr = str_split($number);
   $factor_arr = str_split($factor);
@@ -124,7 +126,6 @@ function _os2web_cpr_filter_modulus11($number) {
  * @return bool
  */
 function _os2web_cpr_filter_date_check($number) {
-  $number = str_replace('-', '', $number);
   $day = substr($number, 0, 2);
   $month = substr($number, 2, 2);
   $year = substr($number, 4, 2);
