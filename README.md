@@ -20,7 +20,7 @@ Installation
 ------------
 This module should reside in the modules directory of the installation,
 most commonly profiles/profile-name/modules, but alternately in 
-sites/all/modules (This could be for development purposes).
+modules (This could be for development purposes).
 
 Remember to go and enable the filter "OS2Web CPR-number filter" in all
 your text formats, and configure the filter settings to your needs. 
