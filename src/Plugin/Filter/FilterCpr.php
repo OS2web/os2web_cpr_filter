@@ -1,7 +1,7 @@
 <?php
 /**
  * @file
- * Contains Drupal\celebrate\Plugin\Filter\FilterCelebrate
+ * Contains Drupal\os2web_cpr_filter\Plugin\Filter\FilterCpr
  */
 
 namespace Drupal\os2web_cpr_filter\Plugin\Filter;
