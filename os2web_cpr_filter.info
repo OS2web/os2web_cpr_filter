@@ -1,4 +1,0 @@
-name = OS2Web CPR-number filter
-description = Text filter searching texts for CPR-numbers using the Drupal core filter API and replacing them.
-core = 7.x
-package = OS2Web

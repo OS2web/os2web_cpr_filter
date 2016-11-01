@@ -1,0 +1,5 @@
+name: OS2Web CPR-number filter
+description: Custom filter searching texts for CPR-numbers to replace them.
+type: module
+package: OS2Web
+core: 8.x
